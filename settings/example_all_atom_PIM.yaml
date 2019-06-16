@@ -1,0 +1,11 @@
+monomer: "PIM-1"
+monomer_path: "monomers/PIM-1_monomer.data"
+monomer_type: "PIM"
+omit_atoms: [6, 7, 26, 27, 60, 61, 62, 63, 64, 65, 66, 67]
+reference_atom: 28
+reference_vectors: [[28, 30], [11, 9]]
+bonds: [[28, 8], [33, 5]]
+repeat_units: 200
+starting_box: 50
+buffer: 0.25
+number_of_chains: 10
