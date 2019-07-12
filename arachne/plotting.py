@@ -89,4 +89,18 @@ def plot_polymers(polymers):
     ax.set_axis_off()
     plt.show()
 
+def plot_CG_monomer(AA_monomer, CG_monomer):
+    fig = plt.figure()
+    ax = fig.gca(projection = "3d")
+    dist = [-10, 10]
+    zero = [0, 0]
+    ax.plot(dist, zero, zero, "-r")
+    ax.plot(zero, dist, zero, "-g")
+    ax.plot(zero, zero, dist, "-b")
+    AA_monomer.plot(ax, "m")
+    CG_monomer.plot(ax, "k", beads="on")
+    set_axes_equal(ax)
+    ax.set_axis_off()
+    plt.show()
+
 

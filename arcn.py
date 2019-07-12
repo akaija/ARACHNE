@@ -7,7 +7,7 @@ import yaml
 
 import arachne
 from arachne.files import read_config
-from arachne.arachne import view_monomer, all_atom_polymer
+from arachne.arachne import *
 
 def start(config_path):
     config = read_config(config_path)
@@ -30,9 +30,21 @@ def render_input(config_path):
 
 @arcn.command()
 @click.argument("config_path", type=click.Path())
+def render_coarse_grained(config_path):
+    config = start(config_path)
+    view_CG_monomer(config)
+
+@arcn.command()
+@click.argument("config_path", type=click.Path())
 def polymerize_all_atom(config_path):
     config = start(config_path)
     all_atom_polymer(config)
+
+@arcn.command()
+@click.argument("config_path", type=click.Path())
+def polymerize_CG(config_path):
+    config = start(config_path)
+    CG_polymer(config)
 
 if __name__ == "__main__":
     arcn()

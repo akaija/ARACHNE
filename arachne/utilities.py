@@ -2,6 +2,9 @@ import math
 
 import numpy as np
 
+from arachne.coarse_grained.atom import Atom
+from arachne.coarse_grained.bond import Bond
+
 def vector(a, b):
     return np.array([b.x, b.y, b.z]) - np.array([a.x, a.y, a.z])
 
@@ -67,12 +70,12 @@ def rotate_monomer(monomer, new_vector, ref, ref_vector):
         monomer.atoms[i].y = a.y + new_vectors[i][1]
         monomer.atoms[i].z = a.z + new_vectors[i][2]
 
-def rotate_180(monomer, ref, axis):
+def rotate_along_axis(monomer, ref, axis, angle):
     a = get_ref(monomer, ref)
     old_vectors = get_vectors(monomer, ref)
     new_vectors = []
     for v in old_vectors:
-        new_vectors.append(rotate(v.v, axis, np.pi))
+        new_vectors.append(rotate(v.v, axis, angle))
     for i in range(len(new_vectors)):
         monomer.atoms[i].x = a.x + new_vectors[i][0]
         monomer.atoms[i].y = a.y + new_vectors[i][1]
@@ -105,4 +108,36 @@ def reflect(monomer, ref, a0, a1, a2):
         atom.z -= 2 * unit(cross)[2] * distance
 
 def distance(a0, a1):
-    return math.sqrt((a0.x - a1.x) ** 2 + (a0.y - a1.y) ** 2 + (a0.z - a1.z) ** 2) 
+    return math.sqrt((a0.x - a1.x) ** 2 + (a0.y - a1.y) ** 2 + (a0.z - a1.z) ** 2)
+
+def coarse_grain(all_atom_monomer, beads, bead_bonds):
+    super_atoms, bonds = [], []
+    for bead in beads:
+        x, y, z, q = 0, 0, 0, 0
+        for atom_id in beads[bead]["atoms"]:
+            atom = get_ref(all_atom_monomer, atom_id)
+            x += atom.x
+            y += atom.y
+            z += atom.z
+            q += atom.q
+        x /= len(beads[bead]["atoms"])
+        y /= len(beads[bead]["atoms"])
+        z /= len(beads[bead]["atoms"])
+        super_atoms.append(Atom(bead, beads[bead]["type"], q, x, y, z))
+    for bond in bead_bonds:
+        for bead in super_atoms:
+            if bead.id == bond[0]:
+                bead_a = bead
+            elif bead.id == bond[1]:
+                bead_b = bead
+        bonds.append(Bond(bead_a, bead_b))
+    return super_atoms, bonds
+
+def angle_between_planes(m0, m1, p0, p1):
+    v00 = vector(get_ref(m0, p0[0]), get_ref(m0, p0[1]))
+    v01 = vector(get_ref(m0, p0[0]), get_ref(m0, p0[2]))
+    v10 = vector(get_ref(m1, p1[0]), get_ref(m1, p1[1]))
+    v11 = vector(get_ref(m1, p1[0]), get_ref(m1, p1[2]))
+    v0 = normal(v00, v01)
+    v1 = normal(v10, v11)
+    return angle(v0, v1)
